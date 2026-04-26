@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سنا القوافي</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Arial';
+  background: #020617;
+  color: #fff;
+}
+
+/* خلفية ذهبية */
+body::before {
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at right, #d4af37 0%, transparent 40%);
+  opacity: 0.15;
+  z-index: -1;
+}
+
+/* الهيدر */
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 28px;
+  color: gold;
+  font-weight: bold;
+}
+
+/* البحث */
+.search-box {
+  text-align: center;
+  margin: 20px;
+}
+
+.search-box input {
+  width: 80%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+/* كرت القصيدة */
+.poem {
+  background: #0f172a;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid gold;
+  box-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+.poem h2 {
+  color: gold;
+}
+
+.poem p {
+  white-space: pre-line;
+  line-height: 2;
+}
+
+/* روابط */
+.links {
+  text-align: center;
+  margin: 30px;
+}
+
+.links a {
+  margin: 10px;
+  display: inline-block;
+  padding: 10px 20px;
+  background: gold;
+  color: black;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>سنا القوافي ✨</header>
+
+<div class="search-box">
+<input type="text" id="search" placeholder="ابحث باسم الشاعر أو كلمات...">
+</div>
+
+<div id="poems"></div>
+
+<div class="links">
+<a href="https://youtube.com" target="_blank">يوتيوب</a>
+<a href="https://wa.me/966000000000" target="_blank">واتساب</a>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCrBy85P281ovyBFqp7xOKI-5RGCKPUQ6c",
+  authDomain: "sna-alqwady.firebaseapp.com",
+  projectId: "sna-alqwady",
+  storageBucket: "sna-alqwady.firebasestorage.app",
+  messagingSenderId: "909724079580",
+  appId: "1:909724079580:web:f09170e928f1ae97c96b19",
+  measurementId: "G-CVYG6GMZEQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const poemsDiv = document.getElementById("poems");
+const searchInput = document.getElementById("search");
+
+let allPoems = [];
+
+/* عرض القصائد */
+function displayPoems(data) {
+  poemsDiv.innerHTML = "";
+  data.forEach(p => {
+    poemsDiv.innerHTML += `
+      <div class="poem">
+        <h2>${p.poet}</h2>
+        <p>${p.text}</p>
+      </div>
+    `;
+  });
+}
+
+/* تحميل من فايربيس */
+async function loadPoems() {
+  const querySnapshot = await getDocs(collection(db, "poems"));
+  allPoems = [];
+  querySnapshot.forEach(doc => {
+    allPoems.push(doc.data());
+  });
+  displayPoems(allPoems);
+}
+
+loadPoems();
+
+/* البحث */
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.toLowerCase();
+  const filtered = allPoems.filter(p =>
+    p.poet.toLowerCase().includes(value) ||
+    p.text.toLowerCase().includes(value)
+  );
+  displayPoems(filtered);
+});
+
+</script>
+
+</body>
+</html>
